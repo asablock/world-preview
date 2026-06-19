@@ -565,7 +565,7 @@ public class PreviewDisplay extends AbstractWidget implements AutoCloseable {
                 putHoverStructEntry(
                         texCenter,
                         new StructHoverHelperEntry(
-                                new BoundingBox(texStartX, 0, texStartZ, texStartX + icon.getWidth(), 0, texStartZ + icon.getHeight()),
+                                new BoundingBox(texStartX, 0, texStartZ, texStartX + iconWidth, 0, texStartZ + iconHeight),
                                 structure
                         )
                 );

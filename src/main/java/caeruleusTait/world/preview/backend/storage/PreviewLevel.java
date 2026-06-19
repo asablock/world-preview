@@ -53,7 +53,7 @@ public class PreviewLevel implements WorldGenLevel {
     public PreviewLevel(RegistryAccess registryAccess, LevelHeightAccessor levelHeightAccessor) {
         this.registryAccess = registryAccess;
         this.levelHeightAccessor = levelHeightAccessor;
-        this.biomeRegistry = this.registryAccess.registryOrThrow(Registries.BIOME);
+        this.biomeRegistry = this.registryAccess.lookupOrThrow(Registries.BIOME);
     }
 
     @Nullable

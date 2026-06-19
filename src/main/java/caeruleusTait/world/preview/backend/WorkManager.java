@@ -258,7 +258,7 @@ public class WorkManager {
         try {
             queueRangeReal(topLeftBlock, bottomRightBlock);
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("Error while queuing range wrapper", e);
         } finally {
             queueIsRunning = false;
         }

@@ -26,9 +26,9 @@ import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.ServerPacksSource;
 import net.minecraft.server.packs.resources.CloseableResourceManager;
+import net.minecraft.tags.TagLoader;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -117,11 +117,11 @@ public class SampleUtils implements AutoCloseable {
         this.biomeSource = biomeSource;
         this.chunkGenerator = chunkGenerator;
         this.registryAccess = minecraftServer.registryAccess();
-        this.structureRegistry = this.registryAccess.registryOrThrow(Registries.STRUCTURE);
+        this.structureRegistry = this.registryAccess.lookupOrThrow(Registries.STRUCTURE);
         this.structureTemplateManager = minecraftServer.getStructureManager();
         this.previewLevel = new PreviewLevel(this.registryAccess, this.levelHeightAccessor);
 
-        ResourceKey<LevelStem> levelStemResourceKey = this.registryAccess.registryOrThrow(LEVEL_STEM)
+        ResourceKey<LevelStem> levelStemResourceKey = this.registryAccess.lookupOrThrow(LEVEL_STEM)
                 .getResourceKey(levelStem)
                 .orElseThrow();
         dimension = Registries.levelStemToLevel(levelStemResourceKey);
@@ -207,7 +207,7 @@ public class SampleUtils implements AutoCloseable {
                     try {
                         Util.copyBetweenDirs(tempDataPackDir, dataPackDir, x);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.error("Failed to copy temp data pack directory {}", x, e);
                     }
                 });
             }
@@ -216,7 +216,7 @@ public class SampleUtils implements AutoCloseable {
         this.biomeSource = biomeSource;
         this.chunkGenerator = chunkGenerator;
         this.registryAccess = layeredRegistryAccess.compositeAccess();
-        this.structureRegistry = this.registryAccess.registryOrThrow(Registries.STRUCTURE);
+        this.structureRegistry = this.registryAccess.lookupOrThrow(Registries.STRUCTURE);
         this.previewLevel = new PreviewLevel(this.registryAccess, this.levelHeightAccessor);
 
         PackRepository packRepository = ServerPacksSource.createPackRepository(levelStorageAccess);
@@ -227,8 +227,7 @@ public class SampleUtils implements AutoCloseable {
                 false
         )).createResourceManager().getSecond();
 
-        HolderGetter<Block> holderGetter = this.registryAccess.registryOrThrow(Registries.BLOCK)
-                .asLookup()
+        HolderGetter<Block> holderGetter = this.registryAccess.lookupOrThrow(Registries.BLOCK)
                 .filterFeatures(worldDataConfiguration.enabledFeatures());
         this.structureTemplateManager = new StructureTemplateManager(
                 resourceManager,
@@ -237,7 +236,7 @@ public class SampleUtils implements AutoCloseable {
                 holderGetter
         );
 
-        ResourceKey<LevelStem> levelStemResourceKey = this.registryAccess.registryOrThrow(LEVEL_STEM)
+        ResourceKey<LevelStem> levelStemResourceKey = this.registryAccess.lookupOrThrow(LEVEL_STEM)
                 .getResourceKey(levelStem)
                 .orElseThrow();
         dimension = Registries.levelStemToLevel(levelStemResourceKey);
@@ -245,12 +244,14 @@ public class SampleUtils implements AutoCloseable {
         // Some mods listen on the <init> of MinecraftServer
         final int functionCompilationLevel = 0;
         final Executor executor = Executors.newSingleThreadExecutor();
-        final LevelSettings levelSettings = new LevelSettings("temp", GameType.CREATIVE, false, Difficulty.NORMAL, true, new GameRules(), worldDataConfiguration);
+        final LevelSettings levelSettings = new LevelSettings("temp", GameType.CREATIVE, false, Difficulty.NORMAL, true, new GameRules(worldDataConfiguration.enabledFeatures()), worldDataConfiguration);
         final PrimaryLevelData primaryLevelData = new PrimaryLevelData(levelSettings, worldOptions, PrimaryLevelData.SpecialWorldProperty.NONE, Lifecycle.stable());
-        final var future = ReloadableServerResources.loadResources(resourceManager, layeredRegistryAccess, worldDataConfiguration.enabledFeatures(), Commands.CommandSelection.DEDICATED, functionCompilationLevel, executor, executor);
+        List<Registry.PendingTags<?>> list = TagLoader.loadTagsForExistingRegistries(resourceManager, layeredRegistryAccess.getLayer(RegistryLayer.STATIC));
+        final var future = ReloadableServerResources.loadResources(resourceManager, layeredRegistryAccess, list, worldDataConfiguration.enabledFeatures(), Commands.CommandSelection.DEDICATED, functionCompilationLevel, executor, executor);
         final ReloadableServerResources reloadableServerResources;
         try {
             reloadableServerResources = future.get();
+            reloadableServerResources.updateStaticRegistryTags();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -456,7 +457,7 @@ public class SampleUtils implements AutoCloseable {
 
     public List<Pair<ResourceLocation, StructureStart>> doStructures(ChunkPos chunkPos) {
         ProtoChunk protoChunk = (ProtoChunk) previewLevel.getChunk(chunkPos.x, chunkPos.z, ChunkStatus.FULL, false);
-        chunkGenerator.createStructures(registryAccess, chunkGeneratorStructureState, structureManager, protoChunk, structureTemplateManager);
+        chunkGenerator.createStructures(registryAccess, chunkGeneratorStructureState, structureManager, protoChunk, structureTemplateManager, dimension);
         Map<Structure, StructureStart> raw = protoChunk.getAllStarts();
         List<Pair<ResourceLocation, StructureStart>> res = new ArrayList<>(raw.size());
         for (Map.Entry<Structure, StructureStart> x : protoChunk.getAllStarts().entrySet()) {

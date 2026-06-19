@@ -15,6 +15,7 @@
   ],
   "client": [
     "client.CheckboxAccessor",
+    "client.CoreShadersAccessor",
     "client.CreateWorldScreenAccessor",
     "client.CreateWorldScreenMixin",
     "client.PauseScreenMixin",

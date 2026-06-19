@@ -69,7 +69,7 @@ public class BiomesList extends BaseObjectSelectionList<BiomesList.BiomeEntry> {
 
         // If we have more than one page, make sure we don't let the scrollbar run away
         double maxScroll = Math.max(0.0, super.getItemCount() * super.itemHeight - super.height);
-        if(super.getScrollAmount() > maxScroll) {
+        if (super.scrollAmount() > maxScroll) {
             // Make sure that the top entry is visible
             super.setScrollAmount(maxScroll);
         }

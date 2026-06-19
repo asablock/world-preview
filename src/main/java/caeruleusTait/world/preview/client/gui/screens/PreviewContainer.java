@@ -466,7 +466,7 @@ public class PreviewContainer implements AutoCloseable, PreviewDisplayDataProvid
                         if (e == null) {
                             setupFailed = false;
                         } else {
-                            e.printStackTrace();
+                            LOGGER.error("Failed to update settings for reload revision", e);
                             setupFailed = true;
                         }
                         return null;
@@ -495,8 +495,8 @@ public class PreviewContainer implements AutoCloseable, PreviewDisplayDataProvid
 
         // Basic world loading / generation setup
         WorldDataConfiguration worldDataConfiguration = dataProvider.worldDataConfiguration(wcContext);
-        Registry<Biome> biomeRegistry = dataProvider.registryAccess(wcContext).registryOrThrow(Registries.BIOME);
-        Registry<Structure> strucutreRegistry = dataProvider.registryAccess(wcContext).registryOrThrow(Registries.STRUCTURE);
+        Registry<Biome> biomeRegistry = dataProvider.registryAccess(wcContext).lookupOrThrow(Registries.BIOME);
+        Registry<Structure> strucutreRegistry = dataProvider.registryAccess(wcContext).lookupOrThrow(Registries.STRUCTURE);
         levelStemRegistry = dataProvider.levelStemRegistry(wcContext);
         levelStemKeys = levelStemRegistry.keySet().stream().sorted(Comparator.comparing(Object::toString)).toList();
 
@@ -510,7 +510,7 @@ public class PreviewContainer implements AutoCloseable, PreviewDisplayDataProvid
                 renderSettings.dimension = levelStemRegistry.keySet().iterator().next();
             }
         }
-        LevelStem levelStem = levelStemRegistry.get(renderSettings.dimension);
+        LevelStem levelStem = levelStemRegistry.get(renderSettings.dimension).orElseThrow().value();
 
         Set<ResourceLocation> caveBiomes = new HashSet<>();
         for (TagKey<Biome> tagKey : List.of(C_CAVE, C_IS_CAVE, FORGE_CAVE, FORGE_IS_CAVE)) {
@@ -580,7 +580,7 @@ public class PreviewContainer implements AutoCloseable, PreviewDisplayDataProvid
                 .toList();
         worldPreview.writeMissingColors(missing);
 
-        allBiomes = biomeRegistry.holders()
+        allBiomes = biomeRegistry.listElements()
                 .map(x -> {
                     final short id = previewData.biome2Id().getShort(x.key().location().toString());
                     final PreviewData.BiomeData biomeData = previewData.biomeId2BiomeData()[id];
@@ -634,7 +634,7 @@ public class PreviewContainer implements AutoCloseable, PreviewDisplayDataProvid
                         return NativeImage.read(in);
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Failed to read structure icon: '{}'", x);
                     return new NativeImage(16, 16, true);
                 }
             });
@@ -653,12 +653,12 @@ public class PreviewContainer implements AutoCloseable, PreviewDisplayDataProvid
         } catch (IOException e) {
             playerIcon = new NativeImage(16, 16, true);
             spawnIcon = new NativeImage(16, 16, true);
-            e.printStackTrace();
+            LOGGER.error("Failed to load player icon and spawn icon : '{}'", playerResource.orElse(null), e);
         }
 
         //  - List entries
-        Registry<Item> itemRegistry = layeredRegistryAccess.compositeAccess().registryOrThrow(Registries.ITEM);
-        allStructures = strucutreRegistry.holders()
+        Registry<Item> itemRegistry = layeredRegistryAccess.compositeAccess().lookupOrThrow(Registries.ITEM);
+        allStructures = strucutreRegistry.listElements()
                 .map(x -> {
                     final short id = previewData.struct2Id().getShort(x.key().location().toString());
                     final PreviewData.StructureData structureData = previewData.structId2StructData()[id];
@@ -666,7 +666,7 @@ public class PreviewContainer implements AutoCloseable, PreviewDisplayDataProvid
                             id,
                             x.key().location(),
                             allStructureIcons[id],
-                            structureData.item() == null ? null : itemRegistry.get(structureData.item()),
+                            structureData.item() == null ? null : itemRegistry.getValue(structureData.item()),
                             structureData.name(),
                             structureData.showByDefault(),
                             structureData.showByDefault()

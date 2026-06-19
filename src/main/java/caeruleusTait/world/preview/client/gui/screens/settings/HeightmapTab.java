@@ -302,7 +302,7 @@ public class HeightmapTab implements Tab {
                 this.colormapTexture = new DynamicTexture(this.colormapImg);
 
                 for (int i = 0; i < 1024; ++i) {
-                    this.colormapImg.setPixelRGBA(i, 0, colorMap.getARGB((float)i / 1024f));
+                    this.colormapImg.setPixel(i, 0, colorMap.getARGB((float)i / 1024f));
                 }
                 this.colormapTexture.upload();
             }

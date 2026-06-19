@@ -58,7 +58,7 @@ public abstract class WorkUnit {
         try {
             return doWork();
         } catch (Throwable e) {
-            e.printStackTrace();
+            WorldPreview.LOGGER.error("Failed to work", e);
             throw e;
         }
     }

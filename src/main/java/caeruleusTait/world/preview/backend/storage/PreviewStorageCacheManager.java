@@ -65,15 +65,13 @@ public interface PreviewStorageCacheManager {
             oos.writeObject(storage);
             zos.closeEntry();
         } catch (IOException e) {
-            WorldPreview.LOGGER.error("Failed to write cached preview data to {}", outFile);
-            e.printStackTrace();
+            WorldPreview.LOGGER.error("Failed to write cached preview data to {}", outFile, e);
         }
 
         try {
             Files.move(outFileTmp, outFile, REPLACE_EXISTING);
         } catch (IOException e) {
-            WorldPreview.LOGGER.error("Failed to move cached preview data to {} --> {}", outFileTmp, outFile);
-            e.printStackTrace();
+            WorldPreview.LOGGER.error("Failed to move cached preview data to {} --> {}", outFileTmp, outFile, e);
         }
     }
 
@@ -92,8 +90,7 @@ public interface PreviewStorageCacheManager {
             ObjectInputStream ois = new ObjectInputStream(zis);
             return (PreviewStorage) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            WorldPreview.LOGGER.error("Failed to read cached preview data from {}", inFile);
-            e.printStackTrace();
+            WorldPreview.LOGGER.error("Failed to read cached preview data from {}", inFile, e);
             return new PreviewStorage(yMin, yMax);
         }
     }

@@ -265,7 +265,7 @@ public class BiomesTab implements Tab {
 
     public enum BiomeListFilter {
         DIMENSION(x -> {
-            LevelStem levelStem = x.previewTab().levelStemRegistry().get(WorldPreview.get().renderSettings().dimension);
+            LevelStem levelStem = x.previewTab().levelStemRegistry().getValue(WorldPreview.get().renderSettings().dimension);
             if (levelStem == null) {
                 return true;
             }

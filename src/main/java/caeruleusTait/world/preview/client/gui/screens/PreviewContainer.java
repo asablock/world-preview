@@ -594,6 +594,7 @@ public class PreviewContainer implements AutoCloseable, PreviewDisplayDataProvid
                 })
                 .sorted(Comparator.comparing(BiomesList.BiomeEntry::id))
                 .toArray(BiomesList.BiomeEntry[]::new);
+        LOGGER.info("allBiomes = {}", allBiomes.length);
 
         biomesList.replaceEntries(new ArrayList<>());
         biomesList.setSelected(null);
@@ -725,6 +726,7 @@ public class PreviewContainer implements AutoCloseable, PreviewDisplayDataProvid
 
     @Override
     public void onVisibleBiomesChanged(Short2LongMap visibleBiomes) {
+        LOGGER.info("visibleBiomes = {}", visibleBiomes.size());
         List<BiomesList.BiomeEntry> res = visibleBiomes.short2LongEntrySet()
                 .stream()
                 .sorted(Comparator.comparing(Short2LongMap.Entry::getLongValue).reversed())

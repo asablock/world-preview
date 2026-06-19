@@ -12,6 +12,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.ShaderProgram;
 import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -53,5 +54,10 @@ public class WorldPreviewClient implements ClientModInitializer {
                 .stream(input.split(" "))
                 .map(StringUtils::capitalize)
                 .collect(Collectors.joining(" "));
+    }
+
+    public static DynamicTexture noFilter(DynamicTexture texture) {
+        texture.setFilter(false, false);
+        return texture;
     }
 }

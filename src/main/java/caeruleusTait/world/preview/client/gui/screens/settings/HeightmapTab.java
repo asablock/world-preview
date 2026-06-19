@@ -299,7 +299,7 @@ public class HeightmapTab implements Tab {
                 this.onClick = onClick;
 
                 this.colormapImg = new NativeImage(NativeImage.Format.RGBA, 1024, 1, true);
-                this.colormapTexture = new DynamicTexture(this.colormapImg);
+                this.colormapTexture = WorldPreviewClient.noFilter(new DynamicTexture(this.colormapImg));
 
                 for (int i = 0; i < 1024; ++i) {
                     this.colormapImg.setPixel(i, 0, colorMap.getARGB((float)i / 1024f));

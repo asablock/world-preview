@@ -107,8 +107,6 @@ public class PreviewDisplay extends AbstractWidget implements AutoCloseable {
         this.minecraft = minecraft;
         this.workManager = WorldPreview.get().workManager();
         this.dataProvider = dataProvider;
-        this.visibleBiomes = new Short2LongOpenHashMap();
-        this.visibleStructures = new Short2LongOpenHashMap();
         this.renderSettings = WorldPreview.get().renderSettings();
         this.config = WorldPreview.get().cfg();
         this.dummyIcon = new NativeImage(16, 16, true);
@@ -119,7 +117,7 @@ public class PreviewDisplay extends AbstractWidget implements AutoCloseable {
     public void resizeImage() {
         closeDisplayTextures();
         previewImg = new NativeImage(NativeImage.Format.RGBA, texWidth, texHeight, true);
-        previewTexture = new DynamicTexture(previewImg);
+        previewTexture = WorldPreviewClient.noFilter(new DynamicTexture(previewImg));
         scaleBlockPos = (QuartPos.SIZE / renderSettings.quartExpand()) * renderSettings.quartStride();
         hoverHelperGridWidth = (texWidth / hoverHelperGridCellSize) + 1;
         hoverHelperGridHeight = (texHeight / hoverHelperGridCellSize) + 1;
@@ -141,12 +139,15 @@ public class PreviewDisplay extends AbstractWidget implements AutoCloseable {
         // Cleanup previous
         closeIconTextures();
 
+        this.visibleBiomes = new Short2LongOpenHashMap();
+        this.visibleStructures = new Short2LongOpenHashMap();
+
         PreviewData.BiomeData[] rawBiomeMap = dataProvider.previewData().biomeId2BiomeData();
         structureRenderInfoMap = dataProvider.renderStructureMap();
         structureItems = dataProvider.structureItems();
-        structureIcons = Arrays.stream(dataProvider.structureIcons()).map(x -> new IconData(x, new DynamicTexture(x))).toArray(IconData[]::new);
-        playerIcon = new IconData(dataProvider.playerIcon(), new DynamicTexture(dataProvider.playerIcon()));
-        spawnIcon = new IconData(dataProvider.spawnIcon(), new DynamicTexture(dataProvider.spawnIcon()));
+        structureIcons = Arrays.stream(dataProvider.structureIcons()).map(x -> new IconData(x, WorldPreviewClient.noFilter(new DynamicTexture(x)))).toArray(IconData[]::new);
+        playerIcon = new IconData(dataProvider.playerIcon(), WorldPreviewClient.noFilter(new DynamicTexture(dataProvider.playerIcon())));
+        spawnIcon = new IconData(dataProvider.spawnIcon(), WorldPreviewClient.noFilter(new DynamicTexture(dataProvider.spawnIcon())));
         playerIcon.texture.upload();
         spawnIcon.texture.upload();
         Arrays.stream(structureIcons).map(IconData::texture).forEach(DynamicTexture::upload);

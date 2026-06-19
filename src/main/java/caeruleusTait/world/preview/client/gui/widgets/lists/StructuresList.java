@@ -68,7 +68,7 @@ public class StructuresList extends BaseObjectSelectionList<StructuresList.Struc
             this.item = item;
             this.itemStack = this.item == null ? null : new ItemStack(this.item, 1);
             this.icon = icon;
-            this.iconTexture = new DynamicTexture(this.icon);
+            this.iconTexture = WorldPreviewClient.noFilter(new DynamicTexture(this.icon));
             this.iconWidth = this.icon.getWidth();
             this.iconHeight = this.icon.getHeight();
             this.showByDefault = showByDefault;

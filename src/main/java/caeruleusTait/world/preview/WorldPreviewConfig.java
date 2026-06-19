@@ -24,6 +24,7 @@ public class WorldPreviewConfig {
     public boolean cacheInNew = false;
     public boolean enableCompression = true;
     public String colorMap = "world_preview:inferno";
+    public int iconSize = 1;
 
     private int numThreads = Math.max(Runtime.getRuntime().availableProcessors() - 1, 1);
 

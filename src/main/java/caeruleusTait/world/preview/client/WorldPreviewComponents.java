@@ -62,7 +62,8 @@ public class WorldPreviewComponents {
     public static final Component SETTINGS_GENERAL_SHOW_IN_MENU_TOOLTIP = Component.translatable("world_preview.settings.general.showinmenu.tooltip");
     public static final Component SETTINGS_GENERAL_SHOW_PLAYER = Component.translatable("world_preview.settings.general.showplayer");
     public static final Component SETTINGS_GENERAL_SHOW_PLAYER_TOOLTIP = Component.translatable("world_preview.settings.general.showplayer.tooltip");
-
+    public static final Component SETTINGS_GENERAL_ICON_SIZE = Component.translatable("world_preview.settings.general.icon_size");
+    public static final Component SETTINGS_GENERAL_ICON_SIZE_TOOLTIP = Component.translatable("world_preview.settings.general.icon_size.tooltip");
 
     // - Sampling settings
     public static final Component SETTINGS_SAMPLE_TITLE = Component.translatable("world_preview.settings.sample.title");

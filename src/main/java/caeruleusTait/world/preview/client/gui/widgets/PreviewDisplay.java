@@ -12,6 +12,7 @@ import caeruleusTait.world.preview.client.gui.PreviewDisplayDataProvider;
 import caeruleusTait.world.preview.client.gui.widgets.lists.BiomesList;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import it.unimi.dsi.fastutil.shorts.Short2LongMap;
 import it.unimi.dsi.fastutil.shorts.Short2LongOpenHashMap;
@@ -501,6 +502,7 @@ public class PreviewDisplay extends AbstractWidget implements AutoCloseable {
         }
 
         final double guiScale = minecraft.getWindow().getGuiScale();
+        final int iconSize = config.iconSize;
 
         // Draw structures
         //  - Do this in a separate RenderHelper loop to ensure that the biome data is overwritten
@@ -519,11 +521,14 @@ public class PreviewDisplay extends AbstractWidget implements AutoCloseable {
                     icon = dummyIcon;
                 }
 
+                int iconWidth = icon.getWidth() * iconSize;
+                int iconHeight = icon.getHeight() * iconSize;
+
                 // Check if visible
-                final int xMin = -(icon.getWidth() / 2);
-                final int xMax = (icon.getWidth() / 2) + 1 + texWidth;
-                final int zMin = -(icon.getHeight() / 2);
-                final int zMax = (icon.getHeight() / 2) + 1 + texHeight;
+                final int xMin = -(iconWidth / 2);
+                final int xMax = (iconWidth / 2) + 1 + texWidth;
+                final int zMin = -(iconHeight / 2);
+                final int zMax = (iconHeight / 2) + 1 + texHeight;
                 if (texCenter.x < xMin || texCenter.z < zMin || texCenter.x > xMax || texCenter.z > zMax) {
                     continue;
                 }
@@ -536,16 +541,21 @@ public class PreviewDisplay extends AbstractWidget implements AutoCloseable {
                 }
 
                 // Render icon / item
-                final int texStartX = texCenter.x - (icon.getWidth() / 2);
-                final int texStartZ = texCenter.z - (icon.getHeight() / 2);
+                final int texStartX = texCenter.x - (iconWidth / 2);
+                final int texStartZ = texCenter.z - (iconHeight / 2);
 
                 final int rXMin = (int) (texStartX + getX() * guiScale);
                 final int rZMin = (int) (texStartZ + getY() * guiScale);
-                final int rXMax = rXMin + icon.getWidth();
-                final int rZMax = rZMin + icon.getHeight();
+                final int rXMax = rXMin + iconWidth;
+                final int rZMax = rZMin + iconHeight;
 
                 if (item != null) {
-                    guiGraphics.renderItem(item, rXMin, rZMin);
+                    PoseStack pose = guiGraphics.pose();
+                    pose.pushPose();
+                    pose.translate(rXMin, rZMin, 0.0F);
+                    pose.scale(iconSize, iconSize, 1.0F);
+                    guiGraphics.renderItem(item, 0, 0);
+                    pose.popPose();
                 } else if (iconTexture != null) {
                     WorldPreviewClient.renderTexture(iconTexture, rXMin, rZMin, rXMax, rZMax);
                 }

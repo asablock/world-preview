@@ -60,6 +60,8 @@
   "world_preview.settings.general.showinmenu.tooltip": "Show a button for opening the preview in the pause menu\n\n(Singleplayer only)",
   "world_preview.settings.general.showplayer": "Show player",
   "world_preview.settings.general.showplayer.tooltip": "Show the current player and spawn on the in-game World Preview map\n\n(Singleplayer only)",
+  "world_preview.settings.general.icon_size": "Icon size: %d",
+  "world_preview.settings.general.icon_size.tooltip": "The size of the structure icons.",
   "world_preview.settings.sample.title": "Resolution",
   "world_preview.settings.sample.head": "Advanced biome sampling settings",
   "world_preview.settings.sample.numChunk.title1": "The size of a chunk in the preview.",
